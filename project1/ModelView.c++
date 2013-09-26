@@ -39,6 +39,9 @@ ModelView::ModelView()
 	    _datapts.push_back( 0.2 );
 	    _datapts.push_back( 0.3 );
 	    _datapts.push_back( -0.3 );
+	    _datapts.push_back( 0.4 );
+	    _datapts.push_back( 0.5 );
+	    _datapts.push_back( -0.8 );
 	    _points = _datapts.size();
 	    defineModel();
 	  }
@@ -192,15 +195,13 @@ void ModelView::defineModel()
 {
   typedef float vec2[2];
 
-  //vec2 dataPoints[2] = { {-0.9, 0.0}, {0.9, 0.0} };
-  float data[3];
-  data[0] = -0.1;
-  data[1] = 0.3;
-  data[2] = 0.4;
-
   vec2 * dataPoints = new vec2[_points];
 
-  float t = -1; float dt = 2 / (_points - 1);
+  float t = -1; float dt = 2.0 / (_points - 1);
+
+#ifdef __DEBUG__
+  std::cout << "t = " << t << ", dt = " << dt << std::endl;
+#endif 
   for( int i = 0; i < _points; ++i, t += dt )
     {
       dataPoints[i][1] = _datapts.at(i);
