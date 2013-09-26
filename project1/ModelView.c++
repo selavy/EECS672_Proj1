@@ -174,13 +174,19 @@ void ModelView::defineModel()
   typedef float vec2[2];
 
   //vec2 dataPoints[2] = { {-0.9, 0.0}, {0.9, 0.0} };
+  float data[3];
+  data[0] = -0.1;
+  data[1] = 0.3;
+  data[2] = 0.4;
+
   vec2 * dataPoints = new vec2[_points];
-  dataPoints[0][0] = -0.9;
-  dataPoints[0][1] = 0.0;
-  dataPoints[1][0] = 0.2;
-  dataPoints[1][1] = 0.2;
-  dataPoints[2][0] = 0.9;
-  dataPoints[2][1] = 0.0;
+
+  float t = -1; float dt = 2 / (_points - 1);
+  for( int i = 0; i < _points; ++i, t += dt )
+    {
+      dataPoints[i][1] = data[i];
+      dataPoints[i][0] = t;
+    }
 
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);

@@ -5,7 +5,7 @@ uniform int color;
 out vec4 fragmentColor;
 
 vec4 colorChoices[2] = {
-     vec4(0.5, 0.5, 0.5, 1.0),
+     vec4(0.4, 0.7, 0.0, 1.0),
      vec4(0.7, 0.7, 0.7, 1.0)
 };
 
