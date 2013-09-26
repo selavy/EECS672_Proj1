@@ -19,7 +19,7 @@ GLint ModelView::pvaLoc_wcPosition;
 
 ModelView::ModelView()
   :
-  _points(2)
+  _points(3)
 {
 	if (ModelView::shaderProgram == 0)
 	{
@@ -173,14 +173,14 @@ void ModelView::defineModel()
 {
   typedef float vec2[2];
 
-  vec2 dataPoints[2] = { {-0.9, 0.0}, {0.9, 0.0} };
-  //vec2* dataPoints = new vec2[_points];
-  /*
+  //vec2 dataPoints[2] = { {-0.9, 0.0}, {0.9, 0.0} };
+  vec2 * dataPoints = new vec2[_points];
   dataPoints[0][0] = -0.9;
   dataPoints[0][1] = 0.0;
-  dataPoints[1][0] = 0.9;
-  dataPoints[1][1] = 0.0;
-  */
+  dataPoints[1][0] = 0.2;
+  dataPoints[1][1] = 0.2;
+  dataPoints[2][0] = 0.9;
+  dataPoints[2][1] = 0.0;
 
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
@@ -192,5 +192,5 @@ void ModelView::defineModel()
   glVertexAttribPointer( ModelView::pvaLoc_wcPosition, 2, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray( ModelView::pvaLoc_wcPosition ); 
 
-  //delete [] dataPoints;
+  delete [] dataPoints;
 }
