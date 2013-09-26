@@ -6,6 +6,8 @@
 #include "Controller.h"
 #include "ShaderIF.h"
 
+#include "CSVReader.h"
+
 #define __DEBUG__
 
 ShaderIF* ModelView::shaderIF = NULL;
@@ -18,8 +20,6 @@ GLint ModelView::ppuLoc_color;
 GLint ModelView::pvaLoc_wcPosition;
 
 ModelView::ModelView()
-  :
-  _points(3)
 {
 	if (ModelView::shaderProgram == 0)
 	{
@@ -30,7 +30,24 @@ ModelView::ModelView()
 	}
 
 	// TODO: define and call method(s) to initialize your model and send data to GPU
-	defineModel();
+	try
+	  {
+	    //CSVReader * reader;
+	    //reader = new CSVReader("ExchangeRates.csv");
+	    //_datapts = reader->getData( 0 );
+
+	    _datapts.push_back( 0.2 );
+	    _datapts.push_back( 0.3 );
+	    _datapts.push_back( -0.3 );
+	    _points = _datapts.size();
+	    defineModel();
+	  }
+	catch( const std::exception& e )
+	  {
+	    std::cerr << e.what();
+	  }
+
+
 	ModelView::numInstances++;
 }
 
@@ -143,12 +160,14 @@ void ModelView::render() const
 	float scaleTrans[4];
 	computeScaleTrans(scaleTrans);
 	// TODO: get rid of code below
+
 	scaleTrans[0] = 1.0;
 	scaleTrans[1] = 0.0;
 	scaleTrans[2] = 1.0;
 	scaleTrans[3] = 0.0;
 	scaleTrans[4] = 1.0;
 	scaleTrans[5] = 0.0;
+
 	glUniform4fv(ModelView::ppuLoc_scaleTrans, 1, scaleTrans);
 
 
@@ -184,7 +203,7 @@ void ModelView::defineModel()
   float t = -1; float dt = 2 / (_points - 1);
   for( int i = 0; i < _points; ++i, t += dt )
     {
-      dataPoints[i][1] = data[i];
+      dataPoints[i][1] = _datapts.at(i);
       dataPoints[i][0] = t;
     }
 

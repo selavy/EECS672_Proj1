@@ -8,6 +8,7 @@ class ShaderIF;
 #include <string>
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include <vector>
 
 // for interfacing to common GLSL data types
 typedef float vec4[4]; 
@@ -59,6 +60,7 @@ private:
 	static void fetchGLSLVariableLocations();
 	void defineModel();
 	int _points;
+	std::vector<double> _datapts;
 };
 
 #endif
