@@ -19,7 +19,9 @@ GLint ModelView::ppuLoc_scaleTrans;
 GLint ModelView::ppuLoc_color;
 GLint ModelView::pvaLoc_wcPosition;
 
-ModelView::ModelView()
+ModelView::ModelView( std::vector<double> data )
+  :
+  _datapts( data )
 {
 	if (ModelView::shaderProgram == 0)
 	{
@@ -36,12 +38,15 @@ ModelView::ModelView()
 	    //reader = new CSVReader("ExchangeRates.csv");
 	    //_datapts = reader->getData( 0 );
 
+/*
 	    _datapts.push_back( 0.2 );
 	    _datapts.push_back( 0.3 );
 	    _datapts.push_back( -0.3 );
 	    _datapts.push_back( 0.4 );
 	    _datapts.push_back( 0.5 );
 	    _datapts.push_back( -0.8 );
+*/
+
 	    _points = _datapts.size();
 	    defineModel();
 	  }

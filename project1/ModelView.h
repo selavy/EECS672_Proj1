@@ -16,7 +16,7 @@ typedef float vec4[4];
 class ModelView
 {
 public:
-	ModelView();
+        ModelView( std::vector<double> data );
 	virtual ~ModelView();
 
 	// xyzLimits: {wcXmin, wcXmax, wcYmin, wcYmax, wcZmin, wcZmax}
