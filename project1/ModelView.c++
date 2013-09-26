@@ -109,10 +109,18 @@ void ModelView::getWCBoundingBox(double* xyzLimits) const
 
   xmin = -1.0;
   xmax = 1.0;
-  ymin = -1.0;
-  ymax  = 1.0;
+  ymin = 0;
+  ymax  = 0;
   zmin = -1.0;
   zmax = 1.0;
+
+  for( std::vector<double>::const_iterator it = _datapts.begin(); it != _datapts.end(); ++it )
+    {
+      if( *it > ymax )
+	ymax = *it;
+      else if( *it < ymin )
+	ymin = *it;
+    }
 
   xyzLimits[0] = xmin; xyzLimits[1] = xmax;
   xyzLimits[1] = ymin; xyzLimits[2] = ymax;
@@ -166,8 +174,8 @@ void ModelView::render() const
 
 	scaleTrans[0] = 1.0;
 	scaleTrans[1] = 0.0;
-	scaleTrans[2] = 1.0;
-	scaleTrans[3] = 0.0;
+	//scaleTrans[2] = 1.0;
+	//scaleTrans[3] = 0.0;
 	scaleTrans[4] = 1.0;
 	scaleTrans[5] = 0.0;
 
