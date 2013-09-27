@@ -112,7 +112,7 @@ void ModelView::getWCBoundingBox(double* xyzLimits) const
 
   xmin = -1.0;
   xmax = 1.0;
-  ymin = 0;
+  ymin = -0.1; /* allow room for the x-axis */
   ymax  = 0;
   zmin = -1.0;
   zmax = 1.0;
@@ -132,8 +132,8 @@ void ModelView::getWCBoundingBox(double* xyzLimits) const
     }
 
   xyzLimits[0] = xmin; xyzLimits[1] = xmax;
-  xyzLimits[1] = ymin; xyzLimits[2] = ymax;
-  xyzLimits[3] = zmin; xyzLimits[4] = zmax;
+  xyzLimits[2] = ymin; xyzLimits[3] = ymax;
+  xyzLimits[4] = zmin; xyzLimits[5] = zmax;
 }
 
 void ModelView::handleCommand(unsigned char key, double ldsX, double ldsY)
@@ -241,7 +241,7 @@ void ModelView::defineModel( int i )
 
   for( int n = 0; n < _points; ++n, t += dt )
     {
-      dataPoints[n][1] = -1 * data.at(n);
+      dataPoints[n][1] = data.at(n);
       dataPoints[n][0] = t;
     }
 
