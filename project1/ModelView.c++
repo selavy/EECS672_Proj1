@@ -43,13 +43,16 @@ ModelView::ModelView( std::vector<double> usd, std::vector<double> aud, std::vec
 	for( int i = 0; i < 4; ++i )
 	  defineModel( i );
 
+	for( int i = 0; i < 1; ++i )
+	  drawAxes( i );
+
 	ModelView::numInstances++;
 }
 
 ModelView::~ModelView()
 {
 	// TODO: delete the vertex array objects and buffers here
-  for( int i = 0; i < 4; ++i )
+  for( int i = 0; i < 5; ++i )
     deleteObject( i );
 
 	if (--numInstances == 0)
@@ -192,14 +195,21 @@ void ModelView::render() const
 
 	// TODO: ACTUAL MODEL RENDERING HERE (OR CALL ANOTHER METHOD FROM HERE)
 
-	for( int i = 0; i < 4; ++i )
+	for( int i = 0; i < 5; ++i )
 	  {
 	    if( vao[i] == 0 )
 	      continue;
 	    glUniform1i( ppuLoc_color, i );
+
+	    if( i > 3 )
+	      {
+		glLineWidth(2.0);
+	      }
 	    glBindVertexArray(vao[i]);
 	    glDrawArrays( GL_LINE_STRIP, 0, _points );
 	  }
+
+	glLineWidth(1.0);
 
 	// restore the previous program
 	glUseProgram(pgm);
@@ -207,8 +217,8 @@ void ModelView::render() const
 
 void ModelView::generateBuffers()
 {
-  glGenVertexArrays(4, vao);
-  glGenBuffers(4, vbo_dataPoints);
+  glGenVertexArrays(5, vao);
+  glGenBuffers(5, vbo_dataPoints);
 }
 
 void ModelView::defineModel( int i )
@@ -230,14 +240,14 @@ void ModelView::defineModel( int i )
       data = _czk;
       break;
     default:
-      data = _usd;
-    }
+      data = _usd; 
+   }
 
   typedef float vec2[2];
 
   vec2 * dataPoints = new vec2[_points];
 
-  float t = -1; float dt = 2.0 / (_points - 1);
+  float t = -1.0; float dt = 2.0 / (_points - 1);
 
   for( int n = 0; n < _points; ++n, t += dt )
     {
@@ -253,4 +263,30 @@ void ModelView::defineModel( int i )
   glEnableVertexAttribArray( ModelView::pvaLoc_wcPosition ); 
 
   delete [] dataPoints;
+}
+
+void ModelView::drawAxes( int i )
+{
+  typedef float vec2[2];
+
+  vec2 * axes = new vec2[2];
+
+  float scaleTrans[4];
+  computeScaleTrans(scaleTrans);
+
+  axes[0][0] = -1.0;                                
+  // y*scaleTrans[2] + scaleTrans[3] = 0
+  // => y = -scaleTrans[3] / scaleTrans[2]
+  axes[0][1] = -1.0 * scaleTrans[3] / scaleTrans[2];
+  axes[1][0] = 1.0;
+  axes[1][1] = axes[0][1];
+
+  glBindVertexArray(vao[4+i]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_dataPoints[4+i]);
+  int numBytesInBuffer = 2 * sizeof( vec2 );
+  glBufferData( GL_ARRAY_BUFFER, numBytesInBuffer, axes, GL_STATIC_DRAW );
+  glVertexAttribPointer( ModelView::pvaLoc_wcPosition, 2, GL_FLOAT, GL_FALSE, 0, 0 );
+  glEnableVertexAttribArray( ModelView::pvaLoc_wcPosition );
+
+  delete [] axes;
 }
