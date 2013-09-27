@@ -16,8 +16,10 @@ typedef float vec4[4];
 class ModelView
 {
 public:
-        ModelView( std::vector<double> data );
+  ModelView( std::vector<double> usd, std::vector<double> aud, std::vector<double> brl, std::vector<double> czk );
 	virtual ~ModelView();
+
+	void deleteObject( int i );
 
 	// xyzLimits: {wcXmin, wcXmax, wcYmin, wcYmax, wcZmin, wcZmax}
 	void getWCBoundingBox(double* xyzLimits) const;
@@ -25,8 +27,8 @@ public:
 	void render() const;
 private:
 	// VAO(s), VBO(s), and other relevant instance variable declarations here...
-	GLuint vbo_dataPoints;
-	GLuint vao;
+	GLuint vbo_dataPoints[4];
+	GLuint vao[4];
 
 	// we assume all instances share the same shader program:
 	static ShaderIF* shaderIF;
@@ -58,9 +60,16 @@ private:
 	static void computeScaleTrans(float* scaleTrans);
 
 	static void fetchGLSLVariableLocations();
-	void defineModel();
+
+	void generateBuffers();
+
+	void defineModel( int i );
 	int _points;
-	std::vector<double> _datapts;
+
+	std::vector<double> _usd;
+	std::vector<double> _aud;
+	std::vector<double> _brl;
+	std::vector<double> _czk;
 };
 
 #endif

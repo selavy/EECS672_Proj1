@@ -16,12 +16,15 @@ GLuint ModelView::shaderProgram = 0;
 
 /* initialize static member variables */
 GLint ModelView::ppuLoc_scaleTrans;
-GLint ModelView::ppuLoc_color;
+GLint ModelView::ppuLoc_color; /* color := [0,3] */
 GLint ModelView::pvaLoc_wcPosition;
 
-ModelView::ModelView( std::vector<double> data )
+ModelView::ModelView( std::vector<double> usd, std::vector<double> aud, std::vector<double> brl, std::vector<double> czk )
   :
-  _datapts( data )
+  _usd( usd ),
+  _aud( aud ),
+  _brl( brl ),
+  _czk( czk )
 {
 	if (ModelView::shaderProgram == 0)
 	{
@@ -32,29 +35,13 @@ ModelView::ModelView( std::vector<double> data )
 	}
 
 	// TODO: define and call method(s) to initialize your model and send data to GPU
-	try
-	  {
-	    //CSVReader * reader;
-	    //reader = new CSVReader("ExchangeRates.csv");
-	    //_datapts = reader->getData( 0 );
+	// Assume that data has same number of points for each category
+	_points = _usd.size();
 
-/*
-	    _datapts.push_back( 0.2 );
-	    _datapts.push_back( 0.3 );
-	    _datapts.push_back( -0.3 );
-	    _datapts.push_back( 0.4 );
-	    _datapts.push_back( 0.5 );
-	    _datapts.push_back( -0.8 );
-*/
+	generateBuffers();
 
-	    _points = _datapts.size();
-	    defineModel();
-	  }
-	catch( const std::exception& e )
-	  {
-	    std::cerr << e.what();
-	  }
-
+	for( int i = 0; i < 4; ++i )
+	  defineModel( i );
 
 	ModelView::numInstances++;
 }
@@ -62,8 +49,8 @@ ModelView::ModelView( std::vector<double> data )
 ModelView::~ModelView()
 {
 	// TODO: delete the vertex array objects and buffers here
-        glDeleteBuffers(1, &vbo_dataPoints);
-        glDeleteVertexArrays(1, &vao);
+  for( int i = 0; i < 4; ++i )
+    deleteObject( i );
 
 	if (--numInstances == 0)
 	{
@@ -73,6 +60,17 @@ ModelView::~ModelView()
 		ModelView::shaderProgram = 0;
 	}
 }
+
+/* function taken from twoTriangles_V1 by Dr. Miller */
+void ModelView::deleteObject( int i )
+{
+  if( vao[i] > 0 ) // hasn't already been deleted
+    {
+      glDeleteBuffers(1, &vbo_dataPoints[i]);
+      glDeleteVertexArrays(1, &vao[i]);
+      vao[i] = vbo_dataPoints[i] = 0;
+    }
+} /* end ModelView::deleteObject() */
 
 // computeScaleTrans determines the current world coordinate region of
 // interest and then uses linearMap to determine how to map coordinates
@@ -119,7 +117,13 @@ void ModelView::getWCBoundingBox(double* xyzLimits) const
   zmin = -1.0;
   zmax = 1.0;
 
-  for( std::vector<double>::const_iterator it = _datapts.begin(); it != _datapts.end(); ++it )
+  std::vector<double> datapts;
+  datapts.insert( datapts.end(), _usd.begin(), _usd.end() );
+  datapts.insert( datapts.end(), _aud.begin(), _aud.end() );
+  datapts.insert( datapts.end(), _brl.begin(), _brl.end() );
+  datapts.insert( datapts.end(), _czk.begin(), _czk.end() );
+  
+  for( std::vector<double>::const_iterator it = datapts.begin(); it != datapts.end(); ++it )
     {
       if( *it > ymax )
 	ymax = *it;
@@ -186,46 +190,63 @@ void ModelView::render() const
 
 	glUniform4fv(ModelView::ppuLoc_scaleTrans, 1, scaleTrans);
 
-
-#ifdef __DEBUG__
-	std::cout << "scaleTrans: " << scaleTrans[0] << ", " << scaleTrans[1] << ", " << scaleTrans[2] << ", " << scaleTrans[3] << std::endl;
-#endif
-
 	// TODO: ACTUAL MODEL RENDERING HERE (OR CALL ANOTHER METHOD FROM HERE)
 
-	glBindVertexArray(vao);
-
-	int color = 0;
-
-	glUniform1i( ppuLoc_color, color );
-	glDrawArrays( GL_LINE_STRIP, 0, _points );
+	for( int i = 0; i < 4; ++i )
+	  {
+	    if( vao[i] == 0 )
+	      continue;
+	    glUniform1i( ppuLoc_color, i );
+	    glBindVertexArray(vao[i]);
+	    glDrawArrays( GL_LINE_STRIP, 0, _points );
+	  }
 
 	// restore the previous program
 	glUseProgram(pgm);
 }
 
-void ModelView::defineModel()
+void ModelView::generateBuffers()
 {
+  glGenVertexArrays(4, vao);
+  glGenBuffers(4, vbo_dataPoints);
+}
+
+void ModelView::defineModel( int i )
+{
+  std::vector<double> data;
+
+  switch( i )
+    {
+    case 0:
+      data = _usd;
+      break;
+    case 1:
+      data = _aud;
+      break;
+    case 2:
+      data = _brl;
+      break;
+    case 3:
+      data = _czk;
+      break;
+    default:
+      data = _usd;
+    }
+
   typedef float vec2[2];
 
   vec2 * dataPoints = new vec2[_points];
 
   float t = -1; float dt = 2.0 / (_points - 1);
 
-#ifdef __DEBUG__
-  std::cout << "t = " << t << ", dt = " << dt << std::endl;
-#endif 
-  for( int i = 0; i < _points; ++i, t += dt )
+  for( int n = 0; n < _points; ++n, t += dt )
     {
-      dataPoints[i][1] = _datapts.at(i);
-      dataPoints[i][0] = t;
+      dataPoints[n][1] = -1 * data.at(n);
+      dataPoints[n][0] = t;
     }
 
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  glGenBuffers(1, &vbo_dataPoints);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_dataPoints);
+  glBindVertexArray(vao[i]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_dataPoints[i]);
   int numBytesInBuffer = _points * sizeof( vec2 );
   glBufferData( GL_ARRAY_BUFFER, numBytesInBuffer, dataPoints, GL_STATIC_DRAW );
   glVertexAttribPointer( ModelView::pvaLoc_wcPosition, 2, GL_FLOAT, GL_FALSE, 0, 0);

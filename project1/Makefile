@@ -23,4 +23,4 @@ Controller.o: ../mvcutil/Controller.h ../mvcutil/Controller.c++
 CSVReader.o: ./CSVReader/CSVReader.h ./CSVReader/CSVReader.c++
 	$(CPP) $(C_FLAGS) ./CSVReader/CSVReader.c++
 clean:
-	rm -rf *~ *.o project1
+	rm -rf *~ *.o project1 \#*

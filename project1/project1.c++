@@ -22,8 +22,8 @@ int main(int argc, char* argv[])
 	  {
 	    /* hardcoding filename for now */
 	    CSVReader * reader = new CSVReader("ExchangeRates.csv");
-	    c.addModel( new ModelView( reader->getData(0) ) );
-	    c.addModel( new ModelView( reader->getData(1) ) );
+
+	    c.addModel( new ModelView( reader->getData(0), reader->getData(1), reader->getData(2), reader->getData(3) ) );
 
 	    glClearColor(1.0, 1.0, 1.0, 1.0);
 
