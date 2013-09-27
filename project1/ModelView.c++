@@ -43,7 +43,7 @@ ModelView::ModelView( const std::vector<double>& usd, const std::vector<double>&
 	for( int i = 0; i < 4; ++i )
 	  defineModel( i );
 
-	for( int i = 0; i < 4; ++i )
+	for( int i = 0; i < 7; ++i )
 	  drawAxes( i );
 
 	ModelView::numInstances++;
@@ -52,7 +52,7 @@ ModelView::ModelView( const std::vector<double>& usd, const std::vector<double>&
 ModelView::~ModelView()
 {
 	// TODO: delete the vertex array objects and buffers here
-  for( int i = 0; i < 8; ++i )
+  for( int i = 0; i < 12; ++i )
     deleteObject( i );
 
 	if (--numInstances == 0)
@@ -115,7 +115,7 @@ void ModelView::getWCBoundingBox(double* xyzLimits) const
 
   xmin = -1.0;
   xmax = 1.0;
-  ymin = -0.1; /* allow room for the x-axis */
+  ymin = -0.005; /* allow room for the x-axis */
   ymax  = 0;
   zmin = -1.0;
   zmax = 1.0;
@@ -195,7 +195,7 @@ void ModelView::render() const
 
 	// TODO: ACTUAL MODEL RENDERING HERE (OR CALL ANOTHER METHOD FROM HERE)
 
-	for( int i = 0; i < 7; ++i )
+	for( int i = 0; i < 11; ++i )
 	  {
 	    if( vao[i] == 0 )
 	      continue;
@@ -212,6 +212,10 @@ void ModelView::render() const
 	    else if( i > 4 )
 	      {
 		glLineWidth(1.4);
+	      }
+	    else
+	      {
+		glLineWidth(2.5);
 	      }
 
 	    glBindVertexArray(vao[i]);
@@ -234,8 +238,8 @@ void ModelView::render() const
 
 void ModelView::generateBuffers()
 {
-  glGenVertexArrays(8, vao);
-  glGenBuffers(8, vbo_dataPoints);
+  glGenVertexArrays(11, vao);
+  glGenBuffers(11, vbo_dataPoints);
 }
 
 void ModelView::defineModel( int i )
