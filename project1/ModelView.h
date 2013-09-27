@@ -16,7 +16,7 @@ typedef float vec4[4];
 class ModelView
 {
 public:
-  ModelView( std::vector<double> usd, std::vector<double> aud, std::vector<double> brl, std::vector<double> czk );
+  ModelView( const std::vector<double>& usd, const std::vector<double>& aud, const std::vector<double>& brl, const std::vector<double>& czk );
 	virtual ~ModelView();
 
 	void deleteObject( int i );
@@ -27,8 +27,8 @@ public:
 	void render() const;
 private:
 	// VAO(s), VBO(s), and other relevant instance variable declarations here...
-	GLuint vbo_dataPoints[5];
-	GLuint vao[5];
+	GLuint vbo_dataPoints[8];
+	GLuint vao[8];
 
 	// we assume all instances share the same shader program:
 	static ShaderIF* shaderIF;

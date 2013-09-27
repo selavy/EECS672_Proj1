@@ -19,7 +19,7 @@ GLint ModelView::ppuLoc_scaleTrans;
 GLint ModelView::ppuLoc_color; /* color := [0,3] */
 GLint ModelView::pvaLoc_wcPosition;
 
-ModelView::ModelView( std::vector<double> usd, std::vector<double> aud, std::vector<double> brl, std::vector<double> czk )
+ModelView::ModelView( const std::vector<double>& usd, const std::vector<double>& aud, const std::vector<double>& brl, const std::vector<double>& czk )
   :
   _usd( usd ),
   _aud( aud ),
@@ -43,7 +43,7 @@ ModelView::ModelView( std::vector<double> usd, std::vector<double> aud, std::vec
 	for( int i = 0; i < 4; ++i )
 	  defineModel( i );
 
-	for( int i = 0; i < 1; ++i )
+	for( int i = 0; i < 4; ++i )
 	  drawAxes( i );
 
 	ModelView::numInstances++;
@@ -52,7 +52,7 @@ ModelView::ModelView( std::vector<double> usd, std::vector<double> aud, std::vec
 ModelView::~ModelView()
 {
 	// TODO: delete the vertex array objects and buffers here
-  for( int i = 0; i < 5; ++i )
+  for( int i = 0; i < 8; ++i )
     deleteObject( i );
 
 	if (--numInstances == 0)
@@ -195,21 +195,38 @@ void ModelView::render() const
 
 	// TODO: ACTUAL MODEL RENDERING HERE (OR CALL ANOTHER METHOD FROM HERE)
 
-	for( int i = 0; i < 5; ++i )
+	for( int i = 0; i < 7; ++i )
 	  {
 	    if( vao[i] == 0 )
 	      continue;
+
+#ifdef __DEBUG__
+	    std::cout << "i = " << i << std::endl;
+#endif
 	    glUniform1i( ppuLoc_color, i );
 
-	    if( i > 3 )
+	    if( i == 4 )
 	      {
 		glLineWidth(2.0);
 	      }
+	    else if( i > 4 )
+	      {
+		glLineWidth(1.4);
+	      }
+
 	    glBindVertexArray(vao[i]);
-	    glDrawArrays( GL_LINE_STRIP, 0, _points );
+
+	    if( i > 3 )
+	      {
+		glDrawArrays( GL_LINE_STRIP, 0, 2 );
+	      }
+	    else
+	      {
+		glDrawArrays( GL_LINE_STRIP, 0, _points );
+	      }
 	  }
 
-	glLineWidth(1.0);
+	glLineWidth(1.0); // restore to default
 
 	// restore the previous program
 	glUseProgram(pgm);
@@ -217,8 +234,8 @@ void ModelView::render() const
 
 void ModelView::generateBuffers()
 {
-  glGenVertexArrays(5, vao);
-  glGenBuffers(5, vbo_dataPoints);
+  glGenVertexArrays(8, vao);
+  glGenBuffers(8, vbo_dataPoints);
 }
 
 void ModelView::defineModel( int i )
@@ -277,9 +294,13 @@ void ModelView::drawAxes( int i )
   axes[0][0] = -1.0;                                
   // y*scaleTrans[2] + scaleTrans[3] = 0
   // => y = -scaleTrans[3] / scaleTrans[2]
-  axes[0][1] = -1.0 * scaleTrans[3] / scaleTrans[2];
+  axes[0][1] = (-1.0 * scaleTrans[3] / scaleTrans[2]) + static_cast<float>(i*0.2);
   axes[1][0] = 1.0;
   axes[1][1] = axes[0][1];
+
+#ifdef __DEBUG__
+  std::cout << "(" << axes[0][0] << "," << axes[0][1] << ");(" << axes[1][0] << "," << axes[1][1] << ")" << std::endl;
+#endif
 
   glBindVertexArray(vao[4+i]);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_dataPoints[4+i]);
