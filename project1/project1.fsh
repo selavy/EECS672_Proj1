@@ -20,6 +20,7 @@ void main()
 {
 	if( color > 4 )
 	    fragmentColor = colorChoices[5];
+
 	else
 	    fragmentColor = colorChoices[color];	
 }

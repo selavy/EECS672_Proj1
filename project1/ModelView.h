@@ -27,8 +27,8 @@ public:
 	void render() const;
 private:
 	// VAO(s), VBO(s), and other relevant instance variable declarations here...
-	GLuint vbo_dataPoints[11];
-	GLuint vao[11];
+	GLuint vbo_dataPoints[12];
+	GLuint vao[12];
 
 	// we assume all instances share the same shader program:
 	static ShaderIF* shaderIF;
@@ -65,6 +65,7 @@ private:
 
 	void defineModel( int i );
 	void drawAxes( int i );
+	void drawYAxis();
 
 	int _points;
 
